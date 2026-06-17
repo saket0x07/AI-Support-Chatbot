@@ -15,7 +15,7 @@ Intent Classifier
       ↓
 Sentiment Analyzer
       ↓
-Retriever (Qdrant Vector DB)
+Retriever (ChromaDB Vector DB)
       ↓
 Prompt Builder
       ↓
@@ -76,4 +76,4 @@ Response to User
 ```bash
 docker-compose up --build
 ```
-This launches FastAPI, Next.js, and a local Qdrant instance.
+This launches the FastAPI and Next.js containers.

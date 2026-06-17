@@ -267,7 +267,7 @@ Intent Classification
 ↓
 Sentiment Analysis
 ↓
-Retriever (Qdrant)
+Retriever (ChromaDB)
 ↓
 Prompt Builder
 ↓
@@ -349,7 +349,7 @@ Escalation accuracy > 75%
 ### Backend
 
 * FastAPI application
-* Qdrant integration
+* ChromaDB integration
 * NLP modules
 * Ticket system
 

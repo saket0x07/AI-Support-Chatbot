@@ -12,7 +12,7 @@ sequenceDiagram
     participant App as Next.js Frontend
     participant API as FastAPI Backend
     participant NLP as NLP Module (Intent/Sentiment)
-    participant Qdrant as Qdrant Vector Store
+    participant Chroma as ChromaDB Vector Store
     participant LLM as Gemini / OpenAI Provider
     participant DB as SQLite DB
 
@@ -23,8 +23,8 @@ sequenceDiagram
     API->>NLP: Classify intent and analyze sentiment
     NLP-->>API: Intent="Subscription", Sentiment="Neutral"
     API->>DB: Write user message (intent & sentiment)
-    API->>Qdrant: Query similar chunks for "How do I cancel?"
-    Qdrant-->>API: Return top-5 documentation paragraphs
+    API->>Chroma: Query similar chunks for "How do I cancel?"
+    Chroma-->>API: Return top-5 documentation paragraphs
     API->>LLM: Generate response (context + prompt + history)
     LLM-->>API: Return generated answer + confidence check
     API->>DB: Write assistant message & citations
@@ -42,7 +42,7 @@ sequenceDiagram
 ### 1. Backend Service (FastAPI)
 The application core that handles routing, database connections, and coordinating LLM and NLP operations.
 
-### 2. Retriever & Vector Database (Qdrant)
+### 2. Retriever & Vector Database (ChromaDB)
 Maintains high-dimensional semantic indexing of CloudFlow help center documents. Queries are mapped to dense vector spaces using Google or OpenAI embeddings.
 
 ### 3. NLP Processors
