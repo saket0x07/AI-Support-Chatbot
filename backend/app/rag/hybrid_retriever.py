@@ -9,6 +9,13 @@ class HybridRetriever:
         self.vector_retriever = Retriver()
         all_docs = self.vector_retriever.vector_store.collection.get()
         self.bm25 = BM25Retriver(all_docs["documents"])
+        self.doc_to_meta = {}
+        if all_docs and "documents" in all_docs and "metadatas" in all_docs:
+            docs = all_docs["documents"] or []
+            metas = all_docs["metadatas"] or []
+            for doc, meta in zip(docs, metas):
+                if doc:
+                    self.doc_to_meta[doc] = meta if meta is not None else {}
     
     def search(self,query,top_k=5,w1=0.6,w2=0.4):
         vector_results = self.vector_retriever.search(query=query,top_k=top_k)

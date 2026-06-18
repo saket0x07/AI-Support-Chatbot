@@ -3,8 +3,8 @@ from app.models.chunk import Chunk
 
 def chunk_documents(
     documents: list[Document],
-    chunk_size: int = 500,
-    chunk_overlap: int = 50
+    chunk_size: int = 1000,
+    chunk_overlap: int = 100
 ) -> list[Chunk]:
     """
     Chunks a list of Document objects into Chunk dataclasses without external dependencies.

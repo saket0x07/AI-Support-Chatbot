@@ -1,7 +1,6 @@
 import os 
 from pathlib import Path
 from dotenv import load_dotenv  
-from google import genai
 
 # Resolve the absolute path to the .env file
 env_path = Path(__file__).resolve().parents[2] / ".env"
@@ -23,15 +22,44 @@ class GeminiClient:
             )
             
         print("API KEY FOUND: True")
-        self.client = genai.Client(api_key=api_key)
-        # Try GEMINI_MODEL first, fallback to LLM_MODEL, default to gemini-1.5-flash
-        self.model_name = (os.getenv("GEMINI_MODEL") or os.getenv("LLM_MODEL") or "gemini-1.5-flash").strip()
+        
+        # Determine if we are using OpenRouter or standard Gemini API
+        self.is_openrouter = api_key.startswith("sk-or-")
+        
+        # Try GEMINI_MODEL first, fallback to LLM_MODEL, default to gemini-2.5-flash
+        model = (os.getenv("GEMINI_MODEL") or os.getenv("LLM_MODEL") or "gemini-2.5-flash").strip()
+        
+        if self.is_openrouter:
+            from openai import OpenAI
+            self.client = OpenAI(
+                base_url="https://openrouter.ai/api/v1",
+                api_key=api_key
+            )
+            # Adapt model name for OpenRouter if needed
+            if "/" not in model:
+                if model.startswith("gemini-"):
+                    model = f"google/{model}"
+            self.model_name = model
+            print(f"Using OpenRouter with model: {self.model_name}")
+        else:
+            from google import genai
+            self.client = genai.Client(api_key=api_key)
+            self.model_name = model
+            print(f"Using standard Gemini API with model: {self.model_name}")
 
     def generate(self, prompt: str) -> str:
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=prompt,
-        )
-        return response.text
+        if self.is_openrouter:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=2000,
+            )
+            return response.choices[0].message.content
+        else:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+            )
+            return response.text
 
         
