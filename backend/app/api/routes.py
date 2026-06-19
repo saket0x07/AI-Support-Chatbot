@@ -21,8 +21,8 @@ async def chat(request: ChatRequest):
         sources=response.get('sources', [])
     )
 
-@router.post("/feedback", response_model=ChatResponse)
-async def feedback(request: FeedbackRequest):
+@router.post("/feedback")
+def feedback(request: FeedbackRequest):
     memory_service.add_feedback(
         session_id=request.session_id,
         query=request.query,
@@ -30,9 +30,6 @@ async def feedback(request: FeedbackRequest):
         rating=request.rating
     )
 
-    return ChatResponse(
-        answer="Thank you for your feedback!",
-        intent="feedback",
-        sentiment="neutral",
-        sources=[]
-    )
+    return {
+        "status":"success"
+    }

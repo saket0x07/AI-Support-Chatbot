@@ -30,6 +30,10 @@ if user_input:
     response = requests.post(API_BASE_URL,json=payload)
     data = response.json()
     answer = data["answer"]
+
+    # Store last query and answer for feedback
+    st.session_state["last_query"] = user_input
+    st.session_state["last_answer"] = answer
     
     if "sources" in data:
         answer += "\n\n## Sources:"
@@ -40,12 +44,22 @@ if user_input:
     with st.chat_message("assistant"):
         st.markdown(answer)
 
+    if "last_answer" in st.session_state:
+        st.markdown("---")
+        st.write("Was this answer helpful ?")
+
         col1,col2 = st.columns(2)
         with col1:
             if st.button("Helpful 👍"):
-                requests.post("http://localhost:8000/feedback",json={"session_id":st.session_state["session_id"],"query":user_input,"answer":answer,"rating":"positive"})
-                st.success("Feedback recorded")
+                response=requests.post("http://localhost:8000/feedback",json={"session_id":st.session_state["session_id"],"query":user_input,"answer":answer,"rating":"positive"})
+                if response.status_code ==200:
+                    st.success("Feedback recorded")
+                else:
+                    st.error(response.text)
         with col2:
             if st.button("Not Helpful 👎"):
-                requests.post("http://localhost:8000/feedback",json={"session_id":st.session_state["session_id"],"query":user_input,"answer":answer,"rating":"negative"})
-                st.success("Feedback recorded")
+                response=requests.post("http://localhost:8000/feedback",json={"session_id":st.session_state["session_id"],"query":user_input,"answer":answer,"rating":"negative"})
+                if response.status_code ==200:
+                    st.success("Feedback recorded")
+                else:
+                    st.error(response.text)
